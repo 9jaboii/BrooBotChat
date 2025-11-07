@@ -1,0 +1,112 @@
+/* Logo Component Styles */
+.logo-container {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.logo-image {
+  object-fit: contain;
+  display: block;
+}
+
+.logo-full {
+  height: 100%;
+}
+
+.logo-icon {
+  height: 100%;
+  width: auto;
+}
+
+/* Size Variants */
+.logo-small {
+  height: 24px;
+}
+
+.logo-small .logo-text {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.logo-medium {
+  height: 40px;
+}
+
+.logo-medium .logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.logo-large {
+  height: 60px;
+}
+
+.logo-large .logo-text {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.logo-text {
+  color: var(--text-primary);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Auth page specific styling */
+.auth-logo-container {
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  justify-content: center;
+}
+
+.auth-logo-container .logo-container {
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.auth-logo-container .logo-image {
+  height: 80px;
+  width: auto;
+}
+
+.auth-logo-container .logo-text {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+/* Sidebar specific styling */
+.sidebar-header .logo-container {
+  margin-bottom: var(--spacing-md);
+}
+
+.sidebar-header .logo-image {
+  height: 36px;
+  width: auto;
+}
+
+.sidebar-header .logo-text {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .logo-large {
+    height: 48px;
+  }
+
+  .logo-large .logo-text {
+    font-size: 1.5rem;
+  }
+
+  .auth-logo-container .logo-image {
+    height: 60px;
+  }
+
+  .auth-logo-container .logo-text {
+    font-size: 1.5rem;
+  }
+}

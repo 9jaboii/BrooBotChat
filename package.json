@@ -1,0 +1,46 @@
+{
+  "name": "broobot",
+  "version": "1.0.0",
+  "description": "BrooBot - AI Assistant with Multiple Modes",
+  "private": true,
+  "dependencies": {
+    "@aws-amplify/ui-react": "^6.0.0",
+    "aws-amplify": "^6.0.0",
+    "axios": "^1.6.2",
+    "dompurify": "^3.0.6",
+    "lucide-react": "^0.294.0",
+    "marked": "^11.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-markdown": "^9.0.1",
+    "react-router-dom": "^6.20.0"
+  },
+  "devDependencies": {
+    "@types/dompurify": "^3.0.5",
+    "@types/node": "^20.10.0",
+    "@types/react": "^18.2.42",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "patch-package": "^8.0.1",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.5"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
