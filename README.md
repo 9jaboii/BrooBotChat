@@ -49,7 +49,7 @@ A production-ready AI assistant platform with three distinct modes: Buddy Mode, 
 
 ### Prerequisites
 
-Since your local machine has CLI issues, we recommend using **CodeSandbox** for development:
+If your local machine has CLI issues, we recommend using **CodeSandbox** for browser-based development:
 
 ### Option 1: CodeSandbox Setup (Recommended)
 
@@ -61,7 +61,7 @@ Since your local machine has CLI issues, we recommend using **CodeSandbox** for 
    - Install dependencies
    - Start the dev server
 
-### Option 2: Local Development (If CLI is working)
+### Option 2: Local Development (with CLI dev tools)
 
 1. Navigate to the project directory:
 ```bash
