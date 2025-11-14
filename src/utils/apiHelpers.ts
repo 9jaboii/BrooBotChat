@@ -2,7 +2,7 @@
  * API Helper utilities for consistent error handling and validation
  */
 
-import { Message } from '@types/index';
+import { Message } from '@types';
 
 /**
  * Validate and normalize message from backend

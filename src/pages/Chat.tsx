@@ -7,7 +7,7 @@ import { MessageList } from '@components/MessageList';
 import { MessageInput } from '@components/MessageInput';
 import { ModeSelector } from '@components/ModeSelector';
 import { Sidebar } from '@components/Sidebar';
-import { AppMode, Message, ChatSession } from '@types/index';
+import { AppMode, Message, ChatSession } from '@types';
 import { sendChatMessage } from '@services/chatService';
 import '../styles/Chat.css';
 

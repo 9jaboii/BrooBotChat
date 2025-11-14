@@ -5,7 +5,7 @@ import {
   AppMode,
   Message,
   ToolRecommendation,
-} from '@types/index';
+} from '@types';
 import {
   normalizeMessage,
   extractErrorMessage,

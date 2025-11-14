@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { AppMode, AppState, ChatSession } from '@types/index';
+import { AppMode, AppState, ChatSession } from '@types';
 
 interface AppContextType {
   appState: AppState;

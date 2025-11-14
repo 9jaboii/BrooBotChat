@@ -1,5 +1,5 @@
 import React from 'react';
-import { Message } from '@types/index';
+import { Message } from '@types';
 import ReactMarkdown from 'react-markdown';
 import '../styles/Chat.css';
 

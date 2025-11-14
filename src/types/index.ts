@@ -30,6 +30,7 @@ export interface MessageMetadata {
   sources?: ResearchSource[];
   attachments?: Attachment[];
   toolRecommendations?: ToolRecommendation[];
+  totalFound?: number;
 }
 
 export interface ResearchSource {

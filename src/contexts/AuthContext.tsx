@@ -1,12 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import {
+import type {
   AuthState,
   AuthContextType,
   SignInCredentials,
   SignUpCredentials,
   AuthUser,
-  AuthErrorCode,
-} from '@types/auth';
+} from '../types/auth';
+import { AuthErrorCode } from '../types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

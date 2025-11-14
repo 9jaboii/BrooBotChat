@@ -1,5 +1,5 @@
 import React from 'react';
-import { AppMode } from '@types/index';
+import { AppMode } from '@types';
 import '../styles/Chat.css';
 
 interface ModeSelectorProps {

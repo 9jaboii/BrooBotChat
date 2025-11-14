@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChatSession, AppMode } from '@types/index';
+import { ChatSession, AppMode } from '@types';
 import { Logo } from './Logo';
 import '../styles/Chat.css';
 

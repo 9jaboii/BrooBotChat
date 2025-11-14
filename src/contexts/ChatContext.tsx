@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { Message, ChatSession, AppMode } from '@types/index';
+import { Message, ChatSession, AppMode } from '@types';
 
 interface ChatContextType {
   currentSession: ChatSession | null;
@@ -22,7 +22,7 @@ interface ChatProviderProps {
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
   const [currentSession, setCurrentSession] = useState<ChatSession | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isStreaming, setIsStreaming] = useState(false);
+  const [isStreaming] = useState(false);
 
   const addMessage = (message: Message) => {
     setMessages((prev) => [...prev, message]);
