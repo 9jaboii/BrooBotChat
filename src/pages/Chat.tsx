@@ -17,13 +17,27 @@ export const Chat: React.FC = () => {
   const { messages, addMessage, createNewSession, setSession, currentSession } = useChat();
   const { appState, setCurrentMode, addSession, updateSession, deleteSession } = useApp();
   const [isLoading, setIsLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
 
   useEffect(() => {
     if (!authState.isAuthenticated) {
       navigate('/signin');
     }
   }, [authState.isAuthenticated, navigate]);
+
+  // Handle window resize to auto-close sidebar on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsSidebarOpen(true);
+      } else {
+        setIsSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     // Initialize a new session if none exists
@@ -105,6 +119,10 @@ export const Chat: React.FC = () => {
   const handleSessionSelect = (session: ChatSession) => {
     setSession(session);
     setCurrentMode(session.mode);
+    // Close sidebar on mobile after selection
+    if (window.innerWidth <= 768) {
+      setIsSidebarOpen(false);
+    }
   };
 
   const handleSignOut = async () => {
@@ -131,7 +149,15 @@ export const Chat: React.FC = () => {
 
   return (
     <div className="chat-layout">
+      {/* Sidebar overlay for mobile - only show on mobile when sidebar is open */}
       {isSidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
+
+      <div className={`sidebar ${isSidebarOpen ? 'sidebar-open' : ''}`}>
         <Sidebar
           sessions={appState.sessions}
           currentSessionId={currentSession?.id || null}
@@ -141,7 +167,7 @@ export const Chat: React.FC = () => {
           userName={authState.user?.name || authState.user?.email}
           onSignOut={handleSignOut}
         />
-      )}
+      </div>
 
       <div className="chat-main">
         <div className="chat-header">
