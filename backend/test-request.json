@@ -1,0 +1,10 @@
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "Hello! Tell me about TypeScript in two sentences."
+    }
+  ],
+  "mode": "buddy",
+  "sessionId": "test-real-api"
+}

@@ -6,6 +6,12 @@ import {
   Message,
   ToolRecommendation,
 } from '@types/index';
+import {
+  normalizeMessage,
+  extractErrorMessage,
+  validateChatRequest,
+  retryRequest
+} from '@/utils/apiHelpers';
 
 // Mock AI Tools Database
 const mockAITools: ToolRecommendation[] = [
@@ -65,13 +71,68 @@ export const sendChatMessage = async (
   request: ChatCompletionRequest
 ): Promise<ChatCompletionResponse> => {
   try {
-    // TODO: Replace with actual API call to backend/Claude
-    // For now, we'll simulate the response based on the mode
+    // Validate request
+    const validation = validateChatRequest(request.messages, request.mode);
+    if (!validation.valid) {
+      throw new Error(validation.error);
+    }
 
-    const response = await simulateAIResponse(request);
-    return response;
+    // Special handling for AI Tool Assistant mode
+    if (request.mode === AppMode.AI_TOOL_ASSISTANT) {
+      const lastMessage = request.messages[request.messages.length - 1];
+
+      // Use retry logic for tool search
+      const toolResponse = await retryRequest(
+        () => chatAPI.findTools(lastMessage.content),
+        2,
+        500
+      );
+
+      const responseMessage: Message = {
+        id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        role: 'assistant',
+        content: toolResponse.message,
+        timestamp: new Date(),
+        mode: request.mode,
+        metadata: {
+          toolRecommendations: toolResponse.tools,
+          totalFound: toolResponse.totalFound
+        },
+      };
+
+      return {
+        message: responseMessage,
+        sessionId: request.sessionId || '',
+      };
+    }
+
+    // For Buddy Mode and Deep Research, use the chat endpoint with retry
+    const response = await retryRequest(
+      () => chatAPI.sendMessage(request),
+      2,
+      1000
+    );
+
+    // Normalize and validate the response message
+    const normalizedMessage = normalizeMessage(response.message);
+
+    return {
+      message: normalizedMessage,
+      sessionId: response.sessionId || request.sessionId || '',
+      usage: response.usage
+    };
   } catch (error: any) {
-    throw new Error(error.message || 'Failed to send message');
+    const errorMessage = extractErrorMessage(error);
+    console.error('Chat API Error:', errorMessage, error);
+
+    // If backend is not available, fall back to mock
+    if (error.code === 'ERR_NETWORK' || error.message?.includes('ECONNREFUSED') || error.message?.includes('connect to backend')) {
+      console.warn('Backend not available, falling back to mock responses');
+      return await simulateAIResponse(request);
+    }
+
+    // Re-throw with better error message
+    throw new Error(errorMessage);
   }
 };
 
@@ -176,18 +237,36 @@ const API_BASE_URL = import.meta.env.VITE_API_ENDPOINT || 'http://localhost:3001
 
 export const chatAPI = {
   sendMessage: async (request: ChatCompletionRequest) => {
-    const response = await axios.post(`${API_BASE_URL}/chat`, request);
-    return response.data;
-  },
+    // Get auth token from localStorage
+    const token = localStorage.getItem('auth_token') || 'mock-token';
 
-  // Future endpoints
-  research: async (query: string, formats: string[]) => {
-    const response = await axios.post(`${API_BASE_URL}/research`, { query, formats });
+    const response = await axios.post(`${API_BASE_URL}/chat`, request, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
     return response.data;
   },
 
   findTools: async (query: string) => {
-    const response = await axios.post(`${API_BASE_URL}/tools/search`, { query });
+    const token = localStorage.getItem('auth_token') || 'mock-token';
+
+    const response = await axios.post(`${API_BASE_URL}/tools/search`,
+      { query, limit: 5 },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    return response.data;
+  },
+
+  // Health check endpoint
+  checkHealth: async () => {
+    const response = await axios.get(`${API_BASE_URL.replace('/api', '')}/health`);
     return response.data;
   },
 };

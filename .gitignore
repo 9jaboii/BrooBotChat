@@ -40,3 +40,9 @@ aws-exports.js
 
 # TypeScript
 *.tsbuildinfo
+
+# API Keys and Secrets
+*_API_KEY.txt
+*_Api_Key
+backend/Broobot_API_KEY.txt
+backend/serperAI_Api_Key
