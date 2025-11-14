@@ -24,8 +24,8 @@ router.post('/tools/search', optionalAuth, async (req, res) => {
 
     console.log(`[TOOL SEARCH API] Query: "${query}"`);
 
-    // Find relevant tools
-    const tools = findRelevantTools(query, {
+    // Find relevant tools (now async with live scraping)
+    const tools = await findRelevantTools(query, {
       limit: limit || 5,
       categories,
       freeOnly,
