@@ -30,11 +30,12 @@ async function scrapeLatestTools() {
           'Accept': 'application/json',
           'X-Return-Format': 'text'
         },
-        timeout: 15000
+        timeout: 30000 // Increased timeout to match Deep Research
       }
     );
 
-    const content = response.data.data?.content || response.data.content || response.data || '';
+    // Jina API returns: response.data.data.text (not .content)
+    const content = response.data.data?.text || response.data.data?.content || response.data.content || response.data || '';
 
     // Parse the content to extract tools
     const tools = parseToolsFromContent(content);
@@ -105,21 +106,60 @@ function parseToolsFromContent(content) {
       tools.push(formatScrapedTool(currentTool));
     }
 
-    // If parsing failed, create generic entries from URLs found
+    // If parsing failed, extract tools from the structured content
     if (tools.length === 0) {
-      const urlPattern = /https?:\/\/[^\s]+/g;
+      // Pattern 1: Find tool names (format: "ToolName | Description" or "ToolName - Description")
+      const toolNamePattern = /^([A-Z][a-zA-Z0-9\s]{2,40})\s*[\|\-]\s*(.+)$/gm;
+      const toolMatches = [...content.matchAll(toolNamePattern)];
+
+      // Pattern 2: Find URLs (with or without protocol)
+      const urlPattern = /(https?:\/\/|www\.)[a-zA-Z0-9\-._~:/?#[\]@!$&'()*+,;=]+/g;
       const urls = content.match(urlPattern) || [];
 
-      urls.slice(0, 20).forEach((url, idx) => {
-        const name = extractToolNameFromUrl(url);
-        if (name) {
+      // Filter and clean URLs
+      const cleanUrls = urls
+        .map(url => url.startsWith('www.') ? `https://${url}` : url)
+        .filter(url =>
+          !url.includes('theresanaiforthat.com') &&
+          !url.includes('linkedin.com') &&
+          !url.includes('twitter.com') &&
+          !url.includes('facebook.com') &&
+          !url.includes('instagram.com') &&
+          !url.includes('youtube.com') &&
+          url.length < 150
+        );
+
+      const uniqueUrls = [...new Set(cleanUrls)];
+
+      console.log(`[TOOL SCRAPER] Found ${toolMatches.length} tool names and ${uniqueUrls.length} URLs`);
+
+      // Create tools from matched names or URLs
+      const toolsToCreate = Math.max(toolMatches.length, uniqueUrls.length);
+
+      for (let i = 0; i < Math.min(toolsToCreate, 20); i++) {
+        const toolMatch = toolMatches[i];
+        const url = uniqueUrls[i];
+
+        let name, description;
+
+        if (toolMatch) {
+          name = toolMatch[1].trim();
+          description = toolMatch[2].trim().slice(0, 100);
+        } else if (url) {
+          name = extractToolNameFromUrl(url);
+          description = `Free AI tool from theresanaiforthat.com`;
+        } else {
+          continue;
+        }
+
+        if (name && name.length > 2) {
           tools.push({
-            id: `scraped_${Date.now()}_${idx}`,
+            id: `scraped_${Date.now()}_${i}`,
             name,
-            description: `Free AI tool from theresanaiforthat.com`,
+            description: description || `Free AI tool from theresanaiforthat.com`,
             category: 'Free AI Tools',
             subcategories: ['Free', 'Trending'],
-            url: url.replace(/[,;]$/, ''),
+            url: url || `https://theresanaiforthat.com/`,
             isFree: true,
             freeTier: {
               features: ['Free tier available']
@@ -130,7 +170,7 @@ function parseToolsFromContent(content) {
             isScraped: true
           });
         }
-      });
+      }
     }
 
   } catch (error) {
