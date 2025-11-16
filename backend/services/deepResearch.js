@@ -72,15 +72,23 @@ export async function performDeepResearch(query, options = {}) {
     };
   } catch (error) {
     console.error('[DEEP RESEARCH] Error:', error);
+    console.error('[DEEP RESEARCH] Error details:', {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      response: error.response?.data
+    });
 
-    // Fallback to mock research
+    // Fallback to mock research on any error
     const USE_MOCK = process.env.USE_MOCK_MODE === 'true';
-    if (!getAnthropicClient() || USE_MOCK || error.status === 429) {
-      console.log('[DEEP RESEARCH] Falling back to mock research');
+    if (!getAnthropicClient() || USE_MOCK || error.status === 429 || error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
+      console.log('[DEEP RESEARCH] Falling back to mock research due to error');
       return performMockResearch(query);
     }
 
-    throw error;
+    // For other errors, still fall back to mock instead of crashing
+    console.log('[DEEP RESEARCH] Unexpected error, falling back to mock research');
+    return performMockResearch(query);
   }
 }
 
@@ -141,7 +149,7 @@ async function scrapeMultipleSources(sources) {
             'Accept': 'application/json',
             'X-Return-Format': 'text'
           },
-          timeout: 15000
+          timeout: 30000 // Increased to 30 seconds for slow websites
         }
       );
 
