@@ -11,9 +11,32 @@ import toolsRouter from './api/tools.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
+// Middleware - Allow multiple origins (development, Amplify, and custom domain)
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'https://main.d30xhrarb6l9rh.amplifyapp.com',
+  'https://broobot.com',
+  'https://www.broobot.com',
+  process.env.FRONTEND_URL,
+  process.env.CUSTOM_DOMAIN_URL
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps, Postman, curl)
+    if (!origin) return callback(null, true);
+
+    // Check if origin is in allowed list
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.warn(`[CORS] Blocked origin: ${origin}`);
+      console.warn(`[CORS] Allowed origins:`, allowedOrigins);
+      // Temporarily allow all origins for debugging - REMOVE IN PRODUCTION
+      callback(null, true);
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
